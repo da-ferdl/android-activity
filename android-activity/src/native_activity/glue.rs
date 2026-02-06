@@ -447,9 +447,7 @@ impl WaitableNativeActivityState {
 
         guard.pending_input_queue = input_queue;
         guard.write_cmd(AppCmd::InputQueueChanged);
-        while guard.thread_state == NativeThreadState::Running
-            && guard.input_queue != guard.pending_input_queue
-        {
+        while guard.input_queue != guard.pending_input_queue {
             guard = self.cond.wait(guard).unwrap();
         }
         guard.pending_input_queue = ptr::null_mut();
@@ -470,9 +468,7 @@ impl WaitableNativeActivityState {
         if guard.pending_window.is_some() {
             guard.write_cmd(AppCmd::InitWindow);
         }
-        while guard.thread_state == NativeThreadState::Running
-            && guard.window != guard.pending_window
-        {
+        while guard.window != guard.pending_window {
             guard = self.cond.wait(guard).unwrap();
         }
         guard.pending_window = None;
@@ -496,7 +492,7 @@ impl WaitableNativeActivityState {
         };
         guard.write_cmd(cmd);
 
-        while guard.thread_state == NativeThreadState::Running && guard.activity_state != state {
+        while guard.activity_state != state {
             guard = self.cond.wait(guard).unwrap();
         }
     }
@@ -509,7 +505,7 @@ impl WaitableNativeActivityState {
         // this to be None
         debug_assert!(!guard.app_has_saved_state, "SaveState request clash");
         guard.write_cmd(AppCmd::SaveState);
-        while guard.thread_state == NativeThreadState::Running && !guard.app_has_saved_state {
+        while !guard.app_has_saved_state {
             guard = self.cond.wait(guard).unwrap();
         }
         guard.app_has_saved_state = false;
@@ -564,9 +560,7 @@ impl WaitableNativeActivityState {
     pub fn notify_main_thread_stopped_running(&self) {
         let mut guard = self.mutex.lock().unwrap();
         guard.thread_state = NativeThreadState::Stopped;
-        // Notify all waiters to unblock any Android callbacks that would otherwise be waiting
-        // indefinitely for the now-stopped (!) main thread.
-        self.cond.notify_all();
+        self.cond.notify_one();
     }
 
     pub unsafe fn pre_exec_cmd(

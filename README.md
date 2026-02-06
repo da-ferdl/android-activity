@@ -1,3 +1,8 @@
+#### Fork Notice:
+This is the android-activity version `0.6.0` with the fix to include games-activity version 4.0 instead of 2.0.
+
+The fix is from the upstream repository - revision-nr.:`a8948332c7c551303d32eb26a59d0abd676e47a5`
+
 # `android-activity`
 
 [![ci](https://github.com/rust-mobile/android-activity/actions/workflows/ci.yml/badge.svg)](https://github.com/rust-mobile/android-activity/actions/workflows/ci.yml)

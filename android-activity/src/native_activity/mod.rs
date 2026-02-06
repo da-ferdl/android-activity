@@ -1,3 +1,5 @@
+#![cfg(any(feature = "native-activity", doc))]
+
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::panic::AssertUnwindSafe;
@@ -199,9 +201,8 @@ impl AndroidAppInner {
             };
 
             trace!("Calling ALooper_pollAll, timeout = {timeout_milliseconds}");
-            assert_eq!(
-                ndk_sys::ALooper_forThread(),
-                self.looper.ptr,
+            assert!(
+                !ndk_sys::ALooper_forThread().is_null(),
                 "Application tried to poll events from non-main thread"
             );
             let id = ndk_sys::ALooper_pollAll(
